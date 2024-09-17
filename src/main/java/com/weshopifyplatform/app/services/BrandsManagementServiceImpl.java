@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.weshopifyplatform.app.beans.BrandsBean;
 import com.weshopifyplatform.app.entities.Brands;
+import com.weshopifyplatform.app.outbound.CategoriesOutboundCommunicator;
 import com.weshopifyplatform.app.repos.BrandsDocumentRepository;
 
 @Service
@@ -18,14 +19,19 @@ public class BrandsManagementServiceImpl implements BrandsManagementService {
 	
 	private ModelMapper modelMapper;
 	
-	public BrandsManagementServiceImpl(BrandsDocumentRepository brandsRepo, ModelMapper modelMapper) {
+	private CategoriesOutboundCommunicator categoriesCoomunicator; 
+	
+	public BrandsManagementServiceImpl(BrandsDocumentRepository brandsRepo, ModelMapper modelMapper,CategoriesOutboundCommunicator categoriesCoomunicator) {
 		this.brandsRepo = brandsRepo;
 		this.modelMapper= modelMapper;
+		this.categoriesCoomunicator=categoriesCoomunicator;
 	}
 
 	@Override
 	public BrandsBean createBrand(BrandsBean brandsBean) {
 		Brands brandsEntity = mapBeanToEntity(brandsBean);
+		
+		
 		brandsRepo.save(brandsEntity);
 		brandsBean = mapEntityToBean(brandsEntity);
 		return brandsBean;
