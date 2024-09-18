@@ -1,5 +1,6 @@
 package com.weshopifyplatform.app.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.weshopifyplatform.app.beans.BrandsBean;
+import com.weshopifyplatform.app.beans.CategoriesBean;
 import com.weshopifyplatform.app.entities.Brands;
 import com.weshopifyplatform.app.outbound.CategoriesOutboundCommunicator;
+import com.weshopifyplatform.app.outbound.CategoriesOutboundFeignClient;
 import com.weshopifyplatform.app.repos.BrandsDocumentRepository;
 
 @Service
@@ -19,19 +22,25 @@ public class BrandsManagementServiceImpl implements BrandsManagementService {
 	
 	private ModelMapper modelMapper;
 	
-	private CategoriesOutboundCommunicator categoriesCoomunicator; 
+	private CategoriesOutboundFeignClient categoriesClient; 
 	
-	public BrandsManagementServiceImpl(BrandsDocumentRepository brandsRepo, ModelMapper modelMapper,CategoriesOutboundCommunicator categoriesCoomunicator) {
+	public BrandsManagementServiceImpl(BrandsDocumentRepository brandsRepo, ModelMapper modelMapper,CategoriesOutboundFeignClient categoriesClient) {
 		this.brandsRepo = brandsRepo;
 		this.modelMapper= modelMapper;
-		this.categoriesCoomunicator=categoriesCoomunicator;
+		this.categoriesClient=categoriesClient;
 	}
 
 	@Override
 	public BrandsBean createBrand(BrandsBean brandsBean) {
 		Brands brandsEntity = mapBeanToEntity(brandsBean);
-		
-		
+		List<CategoriesBean> categoriesList = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(brandsBean.getCategories())) {
+			brandsBean.getCategories().stream().forEach(catBean ->{
+				catBean = categoriesClient.getCategory(catBean.getId());
+				categoriesList.add(catBean);
+			});
+		}
+		brandsEntity.setCategories(categoriesList);
 		brandsRepo.save(brandsEntity);
 		brandsBean = mapEntityToBean(brandsEntity);
 		return brandsBean;
