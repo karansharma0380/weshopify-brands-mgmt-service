@@ -8,8 +8,10 @@ import com.weshopifyplatform.app.beans.CategoriesBean;
 
 //@FeignClient(name = "categories-feign-client", url="localhost:5052")
 @FeignClient( name="weshopify-categories-mgmt-service")
+//@FeignClient(name="WESHOPIFY-PLATFORM-GATEWAY")
 public interface CategoriesOutboundFeignClient {
 
-	@GetMapping(path="/api/categories/{categoryId}")
+	@GetMapping(path="api/categories/{categoryId}")
+	//@GetMapping(path="/spg-categories/api/categories/{categoryId}")
 	public CategoriesBean getCategory(@PathVariable("categoryId") int categoryId);
 }
